@@ -1,4 +1,5 @@
-﻿using ClubApp.Infrastructure.Identity;
+﻿using ClubApp.Infrastructure.Data;
+using ClubApp.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,14 @@ namespace ClubApp.Infrastructure
                 })
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<AppIdentityDbContext>();
+        }
+
+        public static IServiceCollection AddPostDbContext(this IServiceCollection services, string connectionString)
+        {        
+            return services.AddDbContext<PostDbContext>(options =>
+            {
+                options.UseSqlServer(connectionString);
+            });
         }
     }
 }

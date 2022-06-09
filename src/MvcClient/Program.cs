@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var identityConnectionString = builder.Configuration.GetConnectionString("AppIdentityDbContext");
-builder.Services.AddAppIdentity(identityConnectionString)
+var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddAppIdentity(defaultConnectionString)
     .AddDefaultUI();
+
+builder.Services.AddPostDbContext(defaultConnectionString);
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
