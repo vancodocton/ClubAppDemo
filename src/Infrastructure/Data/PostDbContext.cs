@@ -10,8 +10,10 @@ namespace ClubApp.Infrastructure.Data
         {
         }
 
+        protected PostDbContext() : base() { }
+
         public DbSet<Post> Posts { get; set; } = null!;
 
-        public DbSet<Comment> Comments { get; set; } = null!;
+        public DbSet<Comment> Comments { get; set; } = null!;        
     }
 }
