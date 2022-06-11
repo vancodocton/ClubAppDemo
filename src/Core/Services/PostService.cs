@@ -32,7 +32,7 @@ namespace ClubApp.Core.Services
             return postRepository.AddCommentToPostByIdAsync(postId, comment, token);
         }
 
-        public Task<ICollection<Comment>> GetCommentsByPostId(PostId postId, int take = 10, CancellationToken token)
+        public Task<ICollection<Comment>> GetCommentsByPostId(PostId postId, int take = 10, CancellationToken token = default)
         {
             return postRepository.GetCommentsByIdAsync(postId, take, token);
         }
