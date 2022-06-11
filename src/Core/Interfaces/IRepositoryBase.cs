@@ -2,7 +2,8 @@
 
 namespace ClubApp.Core.Interfaces
 {
-    public interface IRepository<T> : IDisposable, IRepositoryBase<T> where T : class
+    public interface IRepository<T> : IDisposable, IRepositoryBase<T>, IReadRepository<T>
+        where T : class, IAggregateRoot
     {
     }
 }
