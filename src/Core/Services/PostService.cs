@@ -25,16 +25,16 @@ namespace ClubApp.Core.Services
             return postRepository.AddAsync(post);
         }
 
-        public Task<Comment> CreateCommentAsync(UserId userId, PostId postId, string content)
+        public Task<Comment> CreateCommentAsync(UserId userId, PostId postId, string content, CancellationToken token = default)
         {
             var comment = new Comment(userId, content);
 
-            return postRepository.AddCommentToPostByIdAsync(postId, comment);
+            return postRepository.AddCommentToPostByIdAsync(postId, comment, token);
         }
 
-        public Task<ICollection<Comment>> GetCommentsByPostId(PostId postId, int take = 10)
+        public Task<ICollection<Comment>> GetCommentsByPostId(PostId postId, int take = 10, CancellationToken token)
         {
-            return postRepository.GetCommentsById(postId, take);
+            return postRepository.GetCommentsByIdAsync(postId, take, token);
         }
     }
 }
