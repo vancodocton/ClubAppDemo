@@ -1,4 +1,4 @@
-﻿using ClubApp.Core.Entities;
+﻿using ClubApp.Core.Entities.PostAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClubApp.Infrastructure.Data
@@ -10,6 +10,6 @@ namespace ClubApp.Infrastructure.Data
         {
         }
 
-        public DbSet<Post>? Post { get; set; }
+        public DbSet<Post> Posts { get; set; } = null!;
     }
 }
