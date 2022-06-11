@@ -16,7 +16,7 @@ namespace ClubApp.Infrastructure.Repositories
             this.dbContext = dbContext;
         }
 
-        public async Task<Comment> AddCommentToPostByIdAsync(string postId, Comment comment, CancellationToken token = default)
+        public async Task<Comment> AddCommentToPostByIdAsync(int postId, Comment comment, CancellationToken token = default)
         {
             var post = await GetByIdAsync(postId);
             if (post == null)
@@ -28,7 +28,7 @@ namespace ClubApp.Infrastructure.Repositories
             return comment;
         }
 
-        public async Task<ICollection<Comment>> GetCommentsByIdAsync(string postId, int takeLastNum, CancellationToken token = default)
+        public async Task<ICollection<Comment>> GetCommentsByIdAsync(int postId, int takeLastNum, CancellationToken token = default)
         {
             var query = dbContext.Comments
                 .AsNoTracking()

@@ -4,7 +4,7 @@
     {
         public UserId UserId { get; private set; }
 
-        public PostId PostId { get; private set; } = null!;
+        public PostId PostId { get; private set; }
 
         public Post Post { get; private set; } = null!;
 
