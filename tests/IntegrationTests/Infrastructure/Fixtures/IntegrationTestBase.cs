@@ -7,16 +7,16 @@ namespace IntegrationTests.Infrastructure.Fixtures
 {
     public class IntegrationTestBase : IClassFixture<TestDatabaseFixture>, IDisposable
     {
-        protected readonly TestPostDbContext dbContext;
-        protected Lazy<IPostRepository> postRepos;
-        protected Lazy<IPostService> postService;
+        protected readonly Lazy<TestPostDbContext> dbContext;
+        protected readonly Lazy<IPostRepository> postRepos;
+        protected readonly Lazy<IPostService> postService;
 
         private bool disposedValue;
 
         public IntegrationTestBase(TestDatabaseFixture fixture)
         {
-            dbContext = fixture.CreateContext();
-            postRepos = new(() => new PostRepository(dbContext));
+            dbContext = new(() => fixture.CreateContext());
+            postRepos = new(() => new PostRepository(dbContext.Value));
             postService = new(() => new PostService(
                 LoggerFactoryProvider.LoggerFactoryInstance.CreateLogger<PostService>(),
                 postRepos.Value)
@@ -29,7 +29,9 @@ namespace IntegrationTests.Infrastructure.Fixtures
             {
                 if (disposing)
                 {
-                    dbContext.Dispose();
+                    if (dbContext.IsValueCreated == true)
+                        dbContext.Value.Dispose();
+                    
                     if (postRepos.IsValueCreated == true)
                         postRepos.Value.Dispose();
 
@@ -46,18 +48,18 @@ namespace IntegrationTests.Infrastructure.Fixtures
             GC.SuppressFinalize(this);
         }
 
-        public async Task DisposeAsync()
-        {
-            await DisposeAsyncCore();
+        //public async Task DisposeAsync()
+        //{
+        //    await DisposeAsyncCore();
 
-            Dispose(disposing: false);
-            GC.SuppressFinalize(this);
-        }
+        //    Dispose(disposing: false);
+        //    GC.SuppressFinalize(this);
+        //}
 
-        protected virtual async ValueTask DisposeAsyncCore()
-        {
-            await dbContext.DisposeAsync();
-        }
+        //protected virtual async ValueTask DisposeAsyncCore()
+        //{
+        //    await dbContext.DisposeAsync();
+        //}
 
         ~IntegrationTestBase()
         {
