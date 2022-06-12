@@ -12,6 +12,7 @@ namespace IntegrationTests.Infrastructure.Fixtures.Seeds
             {
                 new Post("1", "Well 1", 1),
                 new Post("1", "Well 2", 2),
+                new Post("1", "Well 3", 3),
             });
         }
     }

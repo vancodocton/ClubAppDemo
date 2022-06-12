@@ -1,34 +1,42 @@
-﻿namespace IntegrationTests.Infrastructure.Fixtures
-{
-    public abstract class IntegrationTestBase : IDisposable
-    {
-        protected TestPostDbContext dbContext;
-        private bool disposedValue;
+﻿using ClubApp.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
-        protected static bool isDropped = false;
+namespace IntegrationTests.Infrastructure.Fixtures
+{
+
+    public class IntegrationTestBase : IDisposable
+    {
+        public TestPostDbContext DbContext { get; }
+        private bool disposedValue;
+        protected static bool isIntialized = false;
+
         public IntegrationTestBase()
         {
-            dbContext = new TestPostDbContext();
 
-            Initialize(false);
+            DbContext = Initialize();
         }
 
-        protected virtual void Initialize(bool isDeleted)
+        protected virtual TestPostDbContext Initialize()
         {
-            //try
+            var testDbConnectionString = "Server=(localdb)\\mssqllocaldb;Database=ClubAppDb-testing;Trusted_Connection=True;MultipleActiveResultSets=true";
+
+            var optionsBuilder = new DbContextOptionsBuilder<PostDbContext>();
+            optionsBuilder.UseSqlServer(testDbConnectionString, o =>
             {
-                if (!isDropped || isDeleted)
-                {
-                    dbContext.Database.EnsureDeleted();
-                    isDropped = true;
-                }
+                o.EnableRetryOnFailure();
+            });
+
+            var dbContext = new TestPostDbContext(optionsBuilder.Options);
+
+            if (!isIntialized)
+            {
+                isIntialized = true;
+                _ = dbContext.Database.EnsureDeletedAsync().Result;
+                _ = dbContext.Database.EnsureCreatedAsync().Result;
             }
-            //catch (Exception ex) { Console.WriteLine(ex.Message); }
 
-            dbContext.Database.EnsureCreated();
+            return dbContext;
         }
-
-        public void Initialize() => Initialize(true);
 
         protected virtual void Dispose(bool disposing)
         {
@@ -36,7 +44,7 @@
             {
                 if (disposing)
                 {
-                    dbContext.Dispose();
+                    DbContext.Dispose();
                 }
                 disposedValue = true;
             }

@@ -30,10 +30,14 @@ namespace ClubApp.Infrastructure.Repositories
 
         public async Task<ICollection<Comment>> GetCommentsByIdAsync(int postId, int takeLastNum, CancellationToken token = default)
         {
+            if (!await dbContext.Posts.AnyAsync(p => p.Id == postId))
+                throw new PostNotFoundException(postId);
+
             var query = dbContext.Comments
                 .AsNoTracking()
                 .Where(c => c.PostId == postId)
-                .TakeLast(takeLastNum);                
+                .OrderByDescending(c => c.Id)
+                .Take(takeLastNum);
 
             var comments = await query.ToListAsync(token);
             return comments;
