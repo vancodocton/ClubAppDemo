@@ -1,11 +1,6 @@
 ﻿using ClubApp.Infrastructure.Data;
+using IntegrationTests.Infrastructure.Fixtures.Seeds;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IntegrationTests.Infrastructure.Fixtures
 {
@@ -21,6 +16,14 @@ namespace IntegrationTests.Infrastructure.Fixtures
 
             var testDbConnectionString = "Server=(localdb)\\mssqllocaldb;Database=ClubAppDb-testing;Trusted_Connection=True;MultipleActiveResultSets=true";
             optionsBuilder.UseSqlServer(testDbConnectionString);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.ApplyConfiguration(new SeedPost());
+            modelBuilder.ApplyConfiguration(new SeedComment());
         }
     }
 }
