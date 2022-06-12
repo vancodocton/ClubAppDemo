@@ -1,41 +1,26 @@
-﻿using ClubApp.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using ClubApp.Core.Interfaces;
+using ClubApp.Core.Services;
+using ClubApp.Infrastructure.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace IntegrationTests.Infrastructure.Fixtures
 {
-
-    public class IntegrationTestBase : IDisposable
+    public class IntegrationTestBase : IClassFixture<TestDatabaseFixture>, IDisposable
     {
-        public TestPostDbContext DbContext { get; }
+        protected readonly TestPostDbContext dbContext;
+        protected Lazy<IPostRepository> postRepos;
+        protected Lazy<IPostService> postService;
+
         private bool disposedValue;
-        protected static bool isIntialized = false;
 
-        public IntegrationTestBase()
+        public IntegrationTestBase(TestDatabaseFixture fixture)
         {
-
-            DbContext = Initialize();
-        }
-
-        protected virtual TestPostDbContext Initialize()
-        {
-            var testDbConnectionString = "Server=(localdb)\\mssqllocaldb;Database=ClubAppDb-testing;Trusted_Connection=True;MultipleActiveResultSets=true";
-
-            var optionsBuilder = new DbContextOptionsBuilder<PostDbContext>();
-            optionsBuilder.UseSqlServer(testDbConnectionString, o =>
-            {
-                o.EnableRetryOnFailure();
-            });
-
-            var dbContext = new TestPostDbContext(optionsBuilder.Options);
-
-            if (!isIntialized)
-            {
-                isIntialized = true;
-                _ = dbContext.Database.EnsureDeletedAsync().Result;
-                _ = dbContext.Database.EnsureCreatedAsync().Result;
-            }
-
-            return dbContext;
+            dbContext = fixture.CreateContext();
+            postRepos = new(() => new PostRepository(dbContext));
+            postService = new(() => new PostService(
+                LoggerFactoryProvider.LoggerFactoryInstance.CreateLogger<PostService>(),
+                postRepos.Value)
+            );
         }
 
         protected virtual void Dispose(bool disposing)
@@ -44,7 +29,12 @@ namespace IntegrationTests.Infrastructure.Fixtures
             {
                 if (disposing)
                 {
-                    DbContext.Dispose();
+                    dbContext.Dispose();
+                    if (postRepos.IsValueCreated == true)
+                        postRepos.Value.Dispose();
+
+                    if (postService.IsValueCreated == true)
+                        postService.Value.Dispose();
                 }
                 disposedValue = true;
             }
@@ -54,6 +44,19 @@ namespace IntegrationTests.Infrastructure.Fixtures
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        public async Task DisposeAsync()
+        {
+            await DisposeAsyncCore();
+
+            Dispose(disposing: false);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual async ValueTask DisposeAsyncCore()
+        {
+            await dbContext.DisposeAsync();
         }
 
         ~IntegrationTestBase()
