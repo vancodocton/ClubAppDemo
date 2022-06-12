@@ -1,23 +1,56 @@
-﻿using ClubApp.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace IntegrationTests.Infrastructure.Fixtures
+﻿namespace IntegrationTests.Infrastructure.Fixtures
 {
-    public abstract class IntegrationTestBase
+    public abstract class IntegrationTestBase : IDisposable
     {
         protected TestPostDbContext dbContext;
+        private bool disposedValue;
 
+        protected static bool isDropped = false;
         public IntegrationTestBase()
         {
-            dbContext = (TestPostDbContext)new TestPostDbContext();
+            dbContext = new TestPostDbContext();
 
-            dbContext.Database.EnsureDeleted();
+            Initialize(false);
+        }
+
+        protected virtual void Initialize(bool isDeleted)
+        {
+            //try
+            {
+                if (!isDropped || isDeleted)
+                {
+                    dbContext.Database.EnsureDeleted();
+                    isDropped = true;
+                }
+            }
+            //catch (Exception ex) { Console.WriteLine(ex.Message); }
+
             dbContext.Database.EnsureCreated();
+        }
+
+        public void Initialize() => Initialize(true);
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    dbContext.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~IntegrationTestBase()
+        {
+            Dispose(disposing: false);
         }
     }
 }
