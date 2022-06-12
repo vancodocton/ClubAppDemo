@@ -10,9 +10,11 @@ namespace ClubApp.Infrastructure
     {
         public static IdentityBuilder AddAppIdentity(this IServiceCollection services, string connectionString)
         {
+            var migrationsAssembly = typeof(Dependencies).Assembly.GetName().Name;
+
             return services.AddDbContext<AppIdentityDbContext>(options =>
             {
-                options.UseSqlServer(connectionString);
+                options.UseSqlServer(connectionString, o => o.MigrationsAssembly(migrationsAssembly));
             })
                 .AddIdentity<ApplicationUser, ApplicationRole>(options =>
                 {
@@ -23,10 +25,12 @@ namespace ClubApp.Infrastructure
         }
 
         public static IServiceCollection AddPostDbContext(this IServiceCollection services, string connectionString)
-        {        
+        {
+            var migrationsAssembly = typeof(Dependencies).Assembly.GetName().Name;
+
             return services.AddDbContext<PostDbContext>(options =>
             {
-                options.UseSqlServer(connectionString);
+                options.UseSqlServer(connectionString, o => o.MigrationsAssembly(migrationsAssembly));
             });
         }
     }
