@@ -1,24 +1,19 @@
-﻿using ClubApp.Core.Entities.PostAggregate;
-using ClubApp.Core.Exceptions;
+﻿using ClubApp.Core.Exceptions;
+using ClubApp.Core.Interfaces;
 using ClubApp.Core.Services;
 using ClubApp.Infrastructure.Repositories;
 using IntegrationTests.Infrastructure.Fixtures;
-using IntegrationTests.Infrastructure.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace IntegrationTests.Infrastructure.Core.Services
 {
-    public class TestPostService : IClassFixture<IntegrationTestBase>
+    public class TestPostService : IntegrationTestBase
     {
-        private readonly PostService postService;
+        private new readonly IPostService postService;
 
-        public TestPostService(IntegrationTestBase testBase)
+        public TestPostService(TestDatabaseFixture fixture) : base(fixture)
         {
-            var logger = LoggerFactoryProvider.LoggerFactoryInstance.CreateLogger<PostService>();
-
-            var postRepos = new PostRepository(testBase.DbContext);
-
-            postService = new PostService(logger, postRepos);
+            postService = base.postService.Value;
         }
 
         [Theory, TestPriority(100)]

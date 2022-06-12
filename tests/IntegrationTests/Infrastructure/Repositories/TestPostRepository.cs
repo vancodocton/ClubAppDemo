@@ -1,20 +1,20 @@
 ﻿using ClubApp.Core.Entities.PostAggregate;
 using ClubApp.Core.Exceptions;
-using ClubApp.Infrastructure.Repositories;
+using ClubApp.Core.Interfaces;
 using IntegrationTests.Infrastructure.Fixtures;
 
 namespace IntegrationTests.Infrastructure.Repositories
 {
-    public class TestPostRepository : IClassFixture<IntegrationTestBase>
+    public class TestPostRepository : IntegrationTestBase
     {
-        private readonly PostRepository postRepos;
+        private new readonly IPostRepository postRepos;
 
-        public TestPostRepository(IntegrationTestBase testBase)
+        public TestPostRepository(TestDatabaseFixture fixture) : base(fixture)
         {
-            postRepos = new PostRepository(testBase.DbContext);
+            postRepos = base.postRepos.Value;
         }
 
-        [Theory, TestPriority(100)]
+        [Theory]
         [InlineData("1", "1. Post of 1")]
         [InlineData("1", "2. Post of 1")]
         [InlineData("1", "3. Post of 1")]
@@ -29,7 +29,7 @@ namespace IntegrationTests.Infrastructure.Repositories
             Assert.True(createdPost!.Id != 0);
         }
 
-        [Theory, TestPriority(3)]
+        [Theory]
         [InlineData("2", "Comment of 2 to Post with id 1", 1)]
         [InlineData("1", "Comment of 1 to Post with id 1", 1)]
         [InlineData("2", "Comment of 2 to Post with id 2", 2)]
@@ -43,7 +43,7 @@ namespace IntegrationTests.Infrastructure.Repositories
             Assert.True(createdCmt!.Id != 0);
         }
 
-        [Theory, TestPriority(2)]
+        [Theory]
         [InlineData("2", "Comment of 2 to Post with id 100", 100)]
         [InlineData("1", "Comment of 1 to Post with id -1", -1)]
         [InlineData("2", "Comment of 2 to Post with id 0", 0)]
