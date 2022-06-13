@@ -1,4 +1,5 @@
-﻿using ClubApp.Infrastructure;
+﻿using ClubApp.Core.Entities.PostAggregate;
+using ClubApp.Infrastructure;
 using ClubApp.Infrastructure.Data;
 using ClubApp.Infrastructure.Identity;
 using Microsoft.AspNetCore.Builder;
@@ -25,15 +26,22 @@ namespace IntegrationTests.Infrastructure.Migrations
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<AppIdentityDbContext>();
-                await db.Database.MigrateAsync();
                 await db.Database.EnsureDeletedAsync();
+                await db.Database.MigrateAsync();
+
+                //Assert.True(typeof(ApplicationRole).FullName == db.Roles.EntityType.Name);
+                //Assert.True(typeof(ApplicationUser).FullName == db.Users.EntityType.Name);
+                Assert.True(db.Roles is DbSet<ApplicationRole>);
+                Assert.True(db.Users is DbSet<ApplicationUser>);
             }
 
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<PostDbContext>();
                 await db.Database.MigrateAsync();
-                await db.Database.EnsureDeletedAsync();
+
+                Assert.True(typeof(Post).FullName == db.Posts.EntityType.Name);
+                Assert.True(typeof(Comment).FullName == db.Comments.EntityType.Name);
             }
         }
     }
