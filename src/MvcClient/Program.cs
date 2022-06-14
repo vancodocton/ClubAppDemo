@@ -1,4 +1,5 @@
 using ClubApp.Infrastructure;
+using ClubApp.MvcClient.Configs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddAppIdentity(defaultConnectionString)
+
+builder.Services.AddCookieSettings()
+    .AddAppIdentity(defaultConnectionString)
     .AddDefaultUI();
 
 builder.Services.AddPostDbContext(defaultConnectionString);
