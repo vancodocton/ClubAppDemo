@@ -12,11 +12,22 @@ builder.Services.AddCookieSettings()
     .AddAppIdentity(defaultConnectionString)
     .AddDefaultUI();
 
-builder.Services.AddPostDbContext(defaultConnectionString);
 
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddPostDbContext(defaultConnectionString)
+    .AddCoreServices();
+
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+    builder.Services.AddControllersWithViews()
+        .AddRazorRuntimeCompilation();
+}
+else
+{
+    builder.Services.AddControllersWithViews();
+}
 
 var app = builder.Build();
 
