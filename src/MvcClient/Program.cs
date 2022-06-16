@@ -1,4 +1,5 @@
 using ClubApp.Infrastructure;
+using ClubApp.MvcClient.Configs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,11 +10,19 @@ var defaultConnectionString = builder.Configuration.GetConnectionString("Default
 builder.Services.AddAppIdentity(defaultConnectionString)
     .AddDefaultUI();
 
-builder.Services.AddPostDbContext(defaultConnectionString);
+builder.Services.AddPostDbContext(defaultConnectionString)
+    .AddCoreServices();
 
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-builder.Services.AddControllersWithViews();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+    builder.Services.AddControllersWithViews()
+        .AddRazorRuntimeCompilation();
+}
+else
+{
+    builder.Services.AddControllersWithViews();
+}
 
 var app = builder.Build();
 
