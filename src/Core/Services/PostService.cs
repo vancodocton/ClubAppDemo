@@ -19,11 +19,11 @@ namespace ClubApp.Core.Services
             this.postRepository = postRepository;
         }
 
-        public Task<Post> CreatePostAsync(UserId userId, string title)
+        public Task<Post> CreatePostAsync(UserId userId, string title, CancellationToken token = default)
         {
             var post = new Post(userId: userId, title: title);
 
-            return postRepository.AddAsync(post);
+            return postRepository.AddAsync(post, token);
         }
 
         public Task<Comment> CreateCommentAsync(UserId userId, PostId postId, string content, CancellationToken token = default)
